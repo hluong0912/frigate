@@ -69,27 +69,107 @@ detect:
   fps: 5
 
 # go2rtc pulls each camera once and restreams it to Frigate and to viewers.
+# Six cameras planned. Rename cam1..cam6 (same name in go2rtc and cameras),
+# and fill in each camera's IP and stream paths.
 go2rtc:
   streams:
-    cam1: # CHANGE_ME camera name
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAMERA_IP:554/CHANGE_ME_MAIN_STREAM_PATH
+    cam1: # CHANGE_ME
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM1_IP:554/CHANGE_ME_MAIN_STREAM_PATH
     cam1_sub:
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAMERA_IP:554/CHANGE_ME_SUB_STREAM_PATH
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM1_IP:554/CHANGE_ME_SUB_STREAM_PATH
+    cam2: # CHANGE_ME
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM2_IP:554/CHANGE_ME_MAIN_STREAM_PATH
+    cam2_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM2_IP:554/CHANGE_ME_SUB_STREAM_PATH
+    cam3: # CHANGE_ME
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM3_IP:554/CHANGE_ME_MAIN_STREAM_PATH
+    cam3_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM3_IP:554/CHANGE_ME_SUB_STREAM_PATH
+    cam4: # CHANGE_ME
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM4_IP:554/CHANGE_ME_MAIN_STREAM_PATH
+    cam4_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM4_IP:554/CHANGE_ME_SUB_STREAM_PATH
+    cam5: # CHANGE_ME
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM5_IP:554/CHANGE_ME_MAIN_STREAM_PATH
+    cam5_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM5_IP:554/CHANGE_ME_SUB_STREAM_PATH
+    cam6: # CHANGE_ME
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM6_IP:554/CHANGE_ME_MAIN_STREAM_PATH
+    cam6_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAM6_IP:554/CHANGE_ME_SUB_STREAM_PATH
 
 cameras:
-  cam1: # CHANGE_ME, must match the go2rtc stream name
+  # No GPU in the VM: main streams are copied to disk (no re-encode) and only
+  # the low-res sub streams are decoded for detection.
+  cam1:
     ffmpeg:
-      # No GPU in the VM, so streams are copied for recording (no re-encode)
-      # and only the low-res sub stream is decoded for detection.
       inputs:
         - path: rtsp://127.0.0.1:8554/cam1
           input_args: preset-rtsp-restream
-          roles:
-            - record
+          roles: [record]
         - path: rtsp://127.0.0.1:8554/cam1_sub
           input_args: preset-rtsp-restream
-          roles:
-            - detect
+          roles: [detect]
+    detect:
+      width: 640 # CHANGE_ME to the sub stream resolution
+      height: 360
+  cam2:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam2
+          input_args: preset-rtsp-restream
+          roles: [record]
+        - path: rtsp://127.0.0.1:8554/cam2_sub
+          input_args: preset-rtsp-restream
+          roles: [detect]
+    detect:
+      width: 640 # CHANGE_ME to the sub stream resolution
+      height: 360
+  cam3:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam3
+          input_args: preset-rtsp-restream
+          roles: [record]
+        - path: rtsp://127.0.0.1:8554/cam3_sub
+          input_args: preset-rtsp-restream
+          roles: [detect]
+    detect:
+      width: 640 # CHANGE_ME to the sub stream resolution
+      height: 360
+  cam4:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam4
+          input_args: preset-rtsp-restream
+          roles: [record]
+        - path: rtsp://127.0.0.1:8554/cam4_sub
+          input_args: preset-rtsp-restream
+          roles: [detect]
+    detect:
+      width: 640 # CHANGE_ME to the sub stream resolution
+      height: 360
+  cam5:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam5
+          input_args: preset-rtsp-restream
+          roles: [record]
+        - path: rtsp://127.0.0.1:8554/cam5_sub
+          input_args: preset-rtsp-restream
+          roles: [detect]
+    detect:
+      width: 640 # CHANGE_ME to the sub stream resolution
+      height: 360
+  cam6:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam6
+          input_args: preset-rtsp-restream
+          roles: [record]
+        - path: rtsp://127.0.0.1:8554/cam6_sub
+          input_args: preset-rtsp-restream
+          roles: [detect]
     detect:
       width: 640 # CHANGE_ME to the sub stream resolution
       height: 360
