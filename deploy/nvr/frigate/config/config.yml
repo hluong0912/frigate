@@ -68,6 +68,16 @@ detect:
   enabled: true
   fps: 5
 
+# Frigate only tracks person by default.
+objects:
+  track:
+    - person
+    - car
+    - bicycle
+    - motorcycle
+    - dog
+    - cat
+
 # go2rtc pulls each camera once and restreams it to Frigate and to viewers.
 # Six cameras planned. Rename cam1..cam6 (same name in go2rtc and cameras),
 # and fill in each camera's IP and stream paths.

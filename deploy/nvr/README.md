@@ -60,7 +60,7 @@ Export YOLOv9 (Frigate docs recipe) and check the GPU path on the Spark:
 
 ```bash
 cd ~/frigate-detector
-./export-yolov9.sh s 320                      # writes ./yolo.onnx
+./export-yolov9.sh s 320                      # writes ./yolo.onnx (run on an x86 box: onnx-simplifier has no arm64 wheel)
 python3 test_client.py tcp://127.0.0.1:5555 ./yolo.onnx
 docker logs frigate-detector | grep loaded    # want: loaded yolo.onnx on ['CUDAExecutionProvider', ...]
 ```

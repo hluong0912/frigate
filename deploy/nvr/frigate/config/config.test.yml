@@ -71,6 +71,16 @@ detect:
   enabled: true
   fps: 5
 
+# Frigate only tracks person by default.
+objects:
+  track:
+    - person
+    - car
+    - bicycle
+    - motorcycle
+    - dog
+    - cat
+
 cameras:
   test1:
     ffmpeg:
