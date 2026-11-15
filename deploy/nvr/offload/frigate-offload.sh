@@ -67,7 +67,8 @@ while IFS= read -r hour_dir; do
     moved=$((moved + 1)); continue
   fi
   mkdir -p "$dest_root/$rel"
-  rsync -a --remove-source-files "$hour_dir/" "$dest_root/$rel/"
+  # -rt, not -a: the NAS is NFS with root squash, so chown/chmod would fail.
+  rsync -rt --remove-source-files "$hour_dir/" "$dest_root/$rel/"
   find "$hour_dir" -depth -type d -empty -delete
   rmdir "$RECORD_DIR/$day" 2>/dev/null || true
   moved=$((moved + 1))
