@@ -1,0 +1,102 @@
+# TEST config: same as config.yml, but the cameras are a looping sample video
+# (/media/frigate/test/sample.mp4) instead of real RTSP cameras. Use it to
+# check Spark detection, recording and NAS offload before cameras are plugged in.
+# Install as ${FRIGATE_CONFIG_DIR}/config.yml; swap back to config.yml later.
+#
+# Everything marked CHANGE_ME must be filled in before first start.
+# Credentials come from .env ({FRIGATE_RTSP_USER}, {FRIGATE_RTSP_PASSWORD}).
+
+mqtt:
+  enabled: false
+
+# ---------------------------------------------------------------------------
+# Object detection runs on the DGX Spark, not on this host.
+# The zmq detector sends each frame tensor over TCP to spark/zmq_detector_server.py
+# and gets detections back. On first connect Frigate uploads the model file
+# below to the Spark automatically.
+# NOTE: this field does not expand {FRIGATE_*} variables, so write the IP here.
+# ---------------------------------------------------------------------------
+detectors:
+  spark:
+    type: zmq
+    endpoint: tcp://192.168.40.126:5555
+    # Round trip over LAN + GPU inference. Raise if you see timeouts in logs.
+    request_timeout_ms: 1000
+
+model:
+  model_type: yolo-generic
+  width: 320 # must match the imgsz used when exporting the model
+  height: 320
+  input_tensor: nchw
+  input_dtype: float
+  path: /config/model_cache/yolo.onnx
+  labelmap_path: /labelmap/coco-80.txt
+
+# Keep other ML features off so nothing heavy runs on this host.
+semantic_search:
+  enabled: false
+face_recognition:
+  enabled: false
+lpr:
+  enabled: false
+audio:
+  enabled: false
+
+# ---------------------------------------------------------------------------
+# Recording. The local size cap and NAS offload are handled outside Frigate
+# by offload/frigate-offload.sh (on .249: move oldest hours to the NAS once
+# recordings pass 70GB). Retention here is in days and acts only as a safety
+# net; set it longer than the local disk can actually hold so Frigate does not
+# delete footage before it has been moved to the NAS.
+# ---------------------------------------------------------------------------
+record:
+  enabled: true
+  continuous:
+    days: 30
+  motion:
+    days: 30
+  alerts:
+    retain:
+      days: 30
+  detections:
+    retain:
+      days: 30
+
+snapshots:
+  enabled: true
+  retain:
+    default: 14
+
+detect:
+  enabled: true
+  fps: 5
+
+# Frigate only tracks person by default.
+objects:
+  track:
+    - person
+    - car
+    - bicycle
+    - motorcycle
+    - dog
+    - cat
+
+cameras:
+  test1:
+    ffmpeg:
+      inputs:
+        - path: /media/frigate/test/sample.mp4
+          input_args: -re -stream_loop -1 -fflags +genpts
+          roles: [detect, record]
+    detect:
+      width: 768
+      height: 432
+  test2:
+    ffmpeg:
+      inputs:
+        - path: /media/frigate/test/sample.mp4
+          input_args: -re -stream_loop -1 -fflags +genpts
+          roles: [detect, record]
+    detect:
+      width: 768
+      height: 432

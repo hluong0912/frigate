@@ -1,0 +1,16 @@
+# Mount the NAS "frigate" share at /mnt/nas-frigate. Pick ONE option and add
+# the line to /etc/fstab, then: sudo mkdir -p /mnt/nas-frigate && sudo mount -a
+#
+# Placeholders: CHANGE_ME_NAS_IP, CHANGE_ME_SHARE_PATH. NAS path and
+# credentials still to be provided.
+
+# --- Option A: SMB/CIFS (Synology, QNAP, TrueNAS SMB share) ----------------
+# apt install cifs-utils
+# Credentials file /etc/frigate-nas.cred (chmod 600):
+#   username=CHANGE_ME
+#   password=CHANGE_ME
+//CHANGE_ME_NAS_IP/frigate  /mnt/nas-frigate  cifs  credentials=/etc/frigate-nas.cred,uid=0,gid=0,file_mode=0640,dir_mode=0750,vers=3.0,_netdev,nofail,x-systemd.automount  0  0
+
+# --- Option B: NFS ----------------------------------------------------------
+# apt install nfs-common
+# CHANGE_ME_NAS_IP:/CHANGE_ME_SHARE_PATH/frigate  /mnt/nas-frigate  nfs  defaults,_netdev,nofail,x-systemd.automount  0  0
