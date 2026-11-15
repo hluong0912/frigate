@@ -1,0 +1,95 @@
+# Frigate config for the NVR host. Copy to ${FRIGATE_CONFIG_DIR}/config.yml.
+#
+# Everything marked CHANGE_ME must be filled in before first start.
+# Credentials come from .env ({FRIGATE_RTSP_USER}, {FRIGATE_RTSP_PASSWORD}).
+
+mqtt:
+  enabled: false
+
+# ---------------------------------------------------------------------------
+# Object detection runs on the DGX Spark, not on this host.
+# The zmq detector sends each frame tensor over TCP to spark/zmq_detector_server.py
+# and gets detections back. On first connect Frigate uploads the model file
+# below to the Spark automatically.
+# NOTE: this field does not expand {FRIGATE_*} variables, so write the IP here.
+# ---------------------------------------------------------------------------
+detectors:
+  spark:
+    type: zmq
+    endpoint: tcp://CHANGE_ME_SPARK_IP:5555
+    # Round trip over LAN + GPU inference. Raise if you see timeouts in logs.
+    request_timeout_ms: 1000
+
+model:
+  model_type: yolo-generic
+  width: 320 # must match the imgsz used when exporting the model
+  height: 320
+  input_tensor: nchw
+  input_dtype: float
+  path: /config/model_cache/yolo.onnx
+  labelmap_path: /labelmap/coco-80.txt
+
+# Keep other ML features off so nothing heavy runs on this host.
+semantic_search:
+  enabled: false
+face_recognition:
+  enabled: false
+lpr:
+  enabled: false
+audio:
+  enabled: false
+
+# ---------------------------------------------------------------------------
+# Recording. The local size cap and NAS offload are handled outside Frigate
+# by offload/frigate-offload.sh (default: move oldest hours to the NAS once
+# recordings pass 30GB). Retention here is in days and acts only as a safety
+# net; set it longer than the local disk can actually hold so Frigate does not
+# delete footage before it has been moved to the NAS.
+# ---------------------------------------------------------------------------
+record:
+  enabled: true
+  continuous:
+    days: 30
+  motion:
+    days: 30
+  alerts:
+    retain:
+      days: 30
+  detections:
+    retain:
+      days: 30
+
+snapshots:
+  enabled: true
+  retain:
+    default: 14
+
+detect:
+  enabled: true
+  fps: 5
+
+# go2rtc pulls each camera once and restreams it to Frigate and to viewers.
+go2rtc:
+  streams:
+    cam1: # CHANGE_ME camera name
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAMERA_IP:554/CHANGE_ME_MAIN_STREAM_PATH
+    cam1_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@CHANGE_ME_CAMERA_IP:554/CHANGE_ME_SUB_STREAM_PATH
+
+cameras:
+  cam1: # CHANGE_ME, must match the go2rtc stream name
+    ffmpeg:
+      # No GPU in the VM, so streams are copied for recording (no re-encode)
+      # and only the low-res sub stream is decoded for detection.
+      inputs:
+        - path: rtsp://127.0.0.1:8554/cam1
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/cam1_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      width: 640 # CHANGE_ME to the sub stream resolution
+      height: 360

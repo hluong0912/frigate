@@ -1,0 +1,20 @@
+# Run on the DGX Spark:  docker compose up -d --build
+services:
+  frigate-detector:
+    container_name: frigate-detector
+    build: .
+    restart: unless-stopped
+    ports:
+      - "5555:5555" # only the NVR host needs to reach this; firewall it to that IP
+    volumes:
+      - ./models:/models # Frigate uploads the model here on first connect
+    environment:
+      # Add TensorrtExecutionProvider first for more speed (engines are cached in ./models/trt_cache)
+      DETECTOR_PROVIDERS: CUDAExecutionProvider,CPUExecutionProvider
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

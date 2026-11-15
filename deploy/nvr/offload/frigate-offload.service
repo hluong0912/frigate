@@ -1,0 +1,11 @@
+[Unit]
+Description=Move oldest Frigate recordings to the NAS
+After=network-online.target remote-fs.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/frigate-offload.env
+ExecStart=/usr/local/bin/frigate-offload.sh
+Nice=10
+IOSchedulingClass=idle

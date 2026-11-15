@@ -1,0 +1,28 @@
+# Frigate NVR host (.182, or .249 as fallback).
+# Detection is NOT done here: the zmq detector in config.yml sends every
+# detection request to the inference server on the DGX Spark (see ../spark).
+services:
+  frigate:
+    container_name: frigate
+    image: ${FRIGATE_IMAGE:-ghcr.io/blakeblackshear/frigate:stable}
+    restart: unless-stopped
+    stop_grace_period: 30s
+    shm_size: ${FRIGATE_SHM_SIZE:-512mb}
+    env_file: .env
+    environment:
+      TZ: ${TZ:-UTC}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${FRIGATE_CONFIG_DIR:-/srv/frigate/config}:/config
+      - ${FRIGATE_MEDIA_DIR:-/srv/frigate/media}:/media/frigate
+      - type: tmpfs # recording segment cache, keeps writes off the disk
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "8971:8971" # authenticated UI / API
+      - "8554:8554" # RTSP restream
+      - "8555:8555/tcp" # WebRTC
+      - "8555:8555/udp" # WebRTC
+      # Unauthenticated API, localhost only, for the offload job.
+      - "127.0.0.1:${FRIGATE_LOCAL_API_PORT:-5001}:5000"
