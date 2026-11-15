@@ -135,6 +135,10 @@ docker compose up -d
 
 Expect `Model yolo.onnx is ready` in `docker logs frigate`, detections in the
 UI, and recordings under `recordings/`. To test the NAS move without waiting
-for 70 GB, run the offload once with low thresholds:
-`sudo HIGH_WATER_GB=0 LOW_WATER_GB=0 MIN_AGE_MINUTES=60 /usr/local/bin/frigate-offload.sh`
-(the env file is sourced first, so pass overrides via a copy of it if needed).
+for 70 GB, run it once against a copy of the env file with low thresholds:
+
+```bash
+sed -e 's/^HIGH_WATER_GB=.*/HIGH_WATER_GB=0/' -e 's/^LOW_WATER_GB=.*/LOW_WATER_GB=0/' \
+    -e 's/^MIN_AGE_MINUTES=.*/MIN_AGE_MINUTES=60/' /etc/frigate-offload.env > /tmp/offload-test.env
+sudo FRIGATE_OFFLOAD_CONF=/tmp/offload-test.env /usr/local/bin/frigate-offload.sh
+```
