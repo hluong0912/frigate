@@ -16,7 +16,7 @@ mqtt:
 detectors:
   spark:
     type: zmq
-    endpoint: tcp://CHANGE_ME_SPARK_IP:5555
+    endpoint: tcp://192.168.40.126:5555
     # Round trip over LAN + GPU inference. Raise if you see timeouts in logs.
     request_timeout_ms: 1000
 
