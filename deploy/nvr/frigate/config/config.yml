@@ -41,8 +41,8 @@ audio:
 
 # ---------------------------------------------------------------------------
 # Recording. The local size cap and NAS offload are handled outside Frigate
-# by offload/frigate-offload.sh (default: move oldest hours to the NAS once
-# recordings pass 30GB). Retention here is in days and acts only as a safety
+# by offload/frigate-offload.sh (on .249: move oldest hours to the NAS once
+# recordings pass 70GB). Retention here is in days and acts only as a safety
 # net; set it longer than the local disk can actually hold so Frigate does not
 # delete footage before it has been moved to the NAS.
 # ---------------------------------------------------------------------------

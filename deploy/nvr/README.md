@@ -1,5 +1,7 @@
 # Frigate NVR deployment (LAN host + DGX Spark inference + NAS offload)
 
+Chosen host: **192.168.40.249 (debdb)**, 100 GB local, offload at 70 GB. The .182 profile is kept below for reference.
+
 This folder holds what's needed to run Frigate on one of the LAN Debian VMs,
 with **all object detection running on the DGX Spark** and **older recordings
 moved to the NAS** once local usage passes a threshold.

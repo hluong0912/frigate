@@ -1,4 +1,4 @@
-# Frigate NVR host (.182, or .249 as fallback).
+# Frigate NVR host: 192.168.40.249 (debdb).
 # Detection is NOT done here: the zmq detector in config.yml sends every
 # detection request to the inference server on the DGX Spark (see ../spark).
 services:
