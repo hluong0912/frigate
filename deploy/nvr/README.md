@@ -138,7 +138,7 @@ UI, and recordings under `recordings/`. To test the NAS move without waiting
 for 70 GB, run it once against a copy of the env file with low thresholds:
 
 ```bash
-sed -e 's/^HIGH_WATER_GB=.*/HIGH_WATER_GB=0/' -e 's/^LOW_WATER_GB=.*/LOW_WATER_GB=0/' \
-    -e 's/^MIN_AGE_MINUTES=.*/MIN_AGE_MINUTES=60/' /etc/frigate-offload.env > /tmp/offload-test.env
+sudo sed -e 's/^HIGH_WATER_GB=.*/HIGH_WATER_GB=0/' -e 's/^LOW_WATER_GB=.*/LOW_WATER_GB=0/' \
+    -e 's/^MIN_AGE_MINUTES=.*/MIN_AGE_MINUTES=60/' /etc/frigate-offload.env | sudo tee /tmp/offload-test.env >/dev/null
 sudo FRIGATE_OFFLOAD_CONF=/tmp/offload-test.env /usr/local/bin/frigate-offload.sh
 ```
