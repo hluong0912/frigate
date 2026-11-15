@@ -119,3 +119,22 @@ about an hour of full.
 
 If the NAS is NFS with root squash, make sure root on the host can write to
 the target folder, or run the service as a user that can.
+
+## Testing without cameras
+
+`frigate/config/config.test.yml` defines two fake cameras (`test1`, `test2`)
+that loop a sample video with people, bikes and cars:
+
+```bash
+mkdir -p /mnt/chnvme/frigate/media/test
+curl -L -o /mnt/chnvme/frigate/media/test/sample.mp4 \
+  https://github.com/intel-iot-devkit/sample-videos/raw/master/person-bicycle-car-detection.mp4
+cp frigate/config/config.test.yml /srv/frigate/config/config.yml
+docker compose up -d
+```
+
+Expect `Model yolo.onnx is ready` in `docker logs frigate`, detections in the
+UI, and recordings under `recordings/`. To test the NAS move without waiting
+for 70 GB, run the offload once with low thresholds:
+`sudo HIGH_WATER_GB=0 LOW_WATER_GB=0 MIN_AGE_MINUTES=60 /usr/local/bin/frigate-offload.sh`
+(the env file is sourced first, so pass overrides via a copy of it if needed).
