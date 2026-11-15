@@ -55,10 +55,17 @@ the first time it connects.
 
 ## 2. Model
 
-Frigate config uses a `yolo-generic` ONNX model (YOLOv9 recommended) at
-`/config/model_cache/yolo.onnx`, 320x320, exported as described in the
-Frigate docs (Object Detectors → "Downloading YOLO Models"). Put the `.onnx`
-file in `${FRIGATE_CONFIG_DIR}/model_cache/yolo.onnx` on the NVR host.
+Frigate config uses a `yolo-generic` ONNX model at `/config/model_cache/yolo.onnx`, 320x320.
+Export YOLOv9 (Frigate docs recipe) and check the GPU path on the Spark:
+
+```bash
+cd ~/frigate-detector
+./export-yolov9.sh s 320                      # writes ./yolo.onnx
+python3 test_client.py tcp://127.0.0.1:5555 ./yolo.onnx
+docker logs frigate-detector | grep loaded    # want: loaded yolo.onnx on ['CUDAExecutionProvider', ...]
+```
+
+Then copy `yolo.onnx` to `${FRIGATE_CONFIG_DIR}/model_cache/yolo.onnx` on the NVR host.
 
 ## 3. NVR host: Frigate
 
